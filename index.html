@@ -253,77 +253,69 @@
 
     <!-- bagian menampilkan tabel -->
     <table id="example" class="display" style="width: 100%">
-      <thead>
-          <tr>
-              <th>Region</th>
-              <th>Segment</th>
-              <th>Category</th>
-              <th>Profit</th>
-          </tr>
-      </thead>
-      <tbody id="example-body">
-          <!-- data will be rendered here -->
+    <thead>
+      <tr>
+        <th>Region</th>
+        <th>Segment</th>
+        <th>Category</th>
+        <th>Profit</th>
+      </tr>
+    </thead>
+    <tbody id="example-body">
       </tbody>
   </table>
-  </table>
-    <select id="opsi">
-      <option onclick="filterRegion('Central')">Central</option>
-      <option onclick="filterRegion('West')">West</option>
-      <option onclick="filterRegion('South')">South</option>
-      <option onclick="filterRegion('East')">East</option>
-    </select>
-    <button onclick="deleteFilter()">Delete Filtering</button>
-    
-  
+  <select id="opsi">
+    <option value="Central">Central</option>
+    <option value="West">West</option>
+    <option value="South">South</option>
+    <option value="East">East</option>
+  </select>
+  <button onclick="filterRegion(document.getElementById('opsi').value)">Filter By Region</button>  <button onclick="deleteFilter()">delete Filter</button>
 
-  <!-- jquery -->
   <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-  <!-- datatable -->
-  <script src="https://cdn.datatables.net/2.0.8/js/dataTables.js"></script>
+  <script src="//cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
   <script>
-      let table;
-      document.addEventListener("DOMContentLoaded", (event) => {
-          const tBody = document.getElementById("example-body");
-          table = new DataTable("#example", {
-              stateSave: true,
-              stateLoadParams: function (settings, data) {
-                  data.search.search = "";
-              },
-              responsive: true,
-              columns: [
-                  { data: "Region" },
-                  { data: "Segment" },
-                  { data: "Category" },
-                  { data: "Profit" },
-              ],
-          });
-          fetch("profit_json/data.json")
-              .then((res) => res.json())
-              .then((data) => {
-                  data.forEach((item) => {
-                      // cara ideal
-                      table.row
-                          .add({
-                              Region: item.Region,
-                              Segment: item.Segment,
-                              Category: item.Category,
-                              Profit: item.Profit,
-                          })
-                          .draw();
-                  });
-              });
+    let table;
+    document.addEventListener("DOMContentLoaded", (event) => {
+      const tBody = document.getElementById("example-body");
+      table = new DataTable("#example", {
+        stateSave: true,
+        stateLoadParams: function (settings, data) {
+          data.search.search = "";
+        },
+        responsive: true,
+        columns: [
+          { data: "Region" },
+          { data: "Segment" },
+          { data: "Category" },
+          { data: "Profit" },
+        ],
       });
 
-      function filterRegion(region) {
-          if (table) {
-              table
-                  .search(function (row, data) {
-                      return data["Region"] === region;
-                  })
-                  .draw();
-          }
+      fetch("./data.json")
+        .then((res) => res.json())
+        .then((data) => {
+          data.forEach((item) => {
+            // cara ideal
+            table.row
+              .add({
+                Region: item.Region,
+                Segment: item.Segment,
+                Category: item.Category,
+                Profit: item.Profit,
+              })
+              .draw();
+          });
+        });
+    });
+
+    function filterRegion(region) {
+      if (table) {
+        table.search(region.toLowerCase(), "Region").draw();
       }
-      function deleteFilter() {
+    }
+
+    function deleteFilter() {
       if (table) {
         table.search("").draw();
       }
